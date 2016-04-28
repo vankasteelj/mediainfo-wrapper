@@ -1,0 +1,27 @@
+{
+    "name": "mediainfo-wrapper",
+    "version": "0.0.1",
+    "description": "wrapper for mediainfo-prebuilt",
+    "main": "index.js",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/vankasteelj/mediainfo-wrapper/issues"
+    },
+    "dependencies": {
+        "xml-json-parser": "^1.1.8"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vankasteelj/mediainfo-wrapper.git"
+    },
+    "keywords": [
+        "mediainfo",
+        "media",
+        "metadata",
+        "codecs"
+    ],
+    "author": {
+        "name": "Jean van Kasteel",
+        "email": "vankasteelj@gmail.com"
+    }
+}
