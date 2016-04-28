@@ -7,14 +7,14 @@ function getCmd() {
 
 	switch(process.platform) {
         case 'darwin':
-            return path.join(__dirname, '/bin/osx64/mediainfo');
+            return path.join(__dirname, '/lib/osx64/mediainfo');
         case 'win32':
-            return path.join(__dirname, '/bin/win32/mediainfo.exe');
+            return path.join(__dirname, '/lib/win32/mediainfo.exe');
 
         case 'linux':
             return [
-                'LD_LIBRARY_PATH="' + path.join(__dirname, '/bin/linux' + arch) + '"',
-                path.join(__dirname, '/bin/linux' + arch, '/mediainfo')
+                'LD_LIBRARY_PATH="' + path.join(__dirname, '/lib/linux' + arch) + '"',
+                path.join(__dirname, '/lib/linux' + arch, '/mediainfo')
             ].join(' ')
 	}
 }

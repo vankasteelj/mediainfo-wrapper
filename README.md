@@ -22,6 +22,26 @@ mi('foo/bar.mkv', 'foo/bar2.avi').then(function(data) {
 }).catch(function (e){console.error(e)});
 ```
 
+### Cleaning unneccesary binaries
+
+You can clean unneeded binaries, with gulp for example:
+
+```js
+var del = require('del');
+var path = require('path');
+
+// clean mediainfo-wrapper
+gulp.task('clean:mediainfo', () => {
+    return Promise.all(nw.options.platforms.map((platform) => {
+        const sources = path.join('build', pkJson.name, platform);
+        return del([
+            path.join(sources, 'node_modules/mediainfo-wrapper/lib/*'),
+            '!'+path.join(sources, 'node_modules/mediainfo-wrapper/lib/'+platform)
+        ]);
+    }));
+});
+```
+
 ### License
 The MIT License
 

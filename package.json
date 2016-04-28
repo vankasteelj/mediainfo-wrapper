@@ -1,6 +1,6 @@
 {
     "name": "mediainfo-wrapper",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "wrapper for mediainfo-prebuilt",
     "main": "index.js",
     "license": "MIT",
