@@ -1,30 +1,17 @@
 var path = require('path'),
     X2JS = require('xml-json-parser'),
-    exec = require('child_process').execFile;
+    exec = require('child_process').exec;
 
 function getCmd() {
     var arch = process.arch.match(/64/) ? '64' : '32';
 
-	switch(process.platform) {
-        case 'darwin':
-            return path.join(__dirname, '/lib/osx64/mediainfo');
-        case 'win32':
-            return path.join(__dirname, '/lib/win32/mediainfo.exe');
-        case 'linux':
-            return path.join(__dirname, '/lib/linux' + arch, '/mediainfo');
-	}
-}
-
-function getOpts() {
-    var arch = process.arch.match(/64/) ? '64' : '32';
-    if (process.platform === 'linux') {
-        return {
-            env: {
-                LD_LIBRARY_PATH: path.join(__dirname, '/lib/linux' + arch)
-            }
-        };
-    } else {
-        return {};
+    switch (process.platform) {
+    case 'darwin':
+        return '"' + path.join(__dirname, '/lib/osx64/mediainfo') + '"';
+    case 'win32':
+        return '"' + path.join(__dirname, '/lib/win32/mediainfo.exe') + '"';
+    case 'linux':
+        return 'LD_LIBRARY_PATH="' + path.join(__dirname, '/lib/linux' + arch) + '" "' + path.join(__dirname, '/lib/linux' + arch, '/mediainfo') + '"';
     }
 }
 
@@ -34,7 +21,7 @@ function buildOutput(obj) {
         tracks: []
     };
     var track = 0; // counting actual tracks (not General)
-    
+
     for (var i in obj.track) {
         // general
         if (obj.track[i]['_type'] === 'General') {
@@ -43,7 +30,7 @@ function buildOutput(obj) {
                 if (f !== '_type') out.details[f.toLowerCase()] = obj.track[i][f];
             }
 
-        // audio/video/text
+            // audio/video/text
         } else {
             out.tracks[track] = {};
             for (var f in obj.track[i]) {
@@ -76,13 +63,16 @@ function buildJson(xml) {
 }
 
 module.exports = function MediaInfo() {
-    var files = Array.prototype.slice.apply(arguments),
-        cmd = getCmd(),
-        opts = getOpts(),
-        args = ["--Output=XML"].concat(files).concat('--Full');
+    var cmd = [];
+
+    cmd.push(getCmd()); // base command
+    cmd.push('--Output=XML --Full'); // args
+    Array.prototype.slice.apply(arguments).forEach(function (val, idx) {
+        cmd.push('"' + val + '"'); // files
+    });
 
     return new Promise(function (resolve, reject) {
-        exec(cmd, args, function (error, stdout, stderr) {
+        exec(cmd.join(' '), function (error, stdout, stderr) {
             if (error !== null || stderr !== '') {
                 reject(error || stderr);
             } else {
