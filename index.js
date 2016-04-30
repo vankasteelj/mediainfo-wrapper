@@ -10,13 +10,22 @@ function getCmd() {
             return path.join(__dirname, '/lib/osx64/mediainfo');
         case 'win32':
             return path.join(__dirname, '/lib/win32/mediainfo.exe');
-
         case 'linux':
-            return [
-                'LD_LIBRARY_PATH="' + path.join(__dirname, '/lib/linux' + arch) + '"',
-                path.join(__dirname, '/lib/linux' + arch, '/mediainfo')
-            ].join(' ')
+            return path.join(__dirname, '/lib/linux' + arch, '/mediainfo');
 	}
+}
+
+function getOpts() {
+    var arch = process.arch.match(/64/) ? '64' : '32';
+    if (process.platform === 'linux') {
+        return {
+            env: {
+                LD_LIBRARY_PATH: path.join(__dirname, '/lib/linux' + arch)
+            }
+        };
+    } else {
+        return {};
+    }
 }
 
 function buildOutput(obj) {
@@ -69,6 +78,7 @@ function buildJson(xml) {
 module.exports = function MediaInfo() {
     var files = Array.prototype.slice.apply(arguments),
         cmd = getCmd(),
+        opts = getOpts(),
         args = ["--Output=XML"].concat(files).concat('--Full');
 
     return new Promise(function (resolve, reject) {
