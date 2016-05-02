@@ -63,16 +63,18 @@ function buildJson(xml) {
 }
 
 module.exports = function MediaInfo() {
+    var args = [].slice.call(arguments);
+    var cmd_options = typeof args[0] === "object" ? args.shift() : {};
     var cmd = [];
 
     cmd.push(getCmd()); // base command
     cmd.push('--Output=XML --Full'); // args
-    Array.prototype.slice.apply(arguments).forEach(function (val, idx) {
+    Array.prototype.slice.apply(args).forEach(function (val, idx) {
         cmd.push('"' + val + '"'); // files
     });
 
     return new Promise(function (resolve, reject) {
-        exec(cmd.join(' '), function (error, stdout, stderr) {
+        exec(cmd.join(' '), cmd_options, function (error, stdout, stderr) {
             if (error !== null || stderr !== '') {
                 reject(error || stderr);
             } else {
