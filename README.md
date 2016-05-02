@@ -22,15 +22,23 @@ mi('foo/bar.mkv', 'foo/bar2.avi').then(function(data) {
 }).catch(function (e){console.error(e)});
 ```
 
+### Using child_process power
+
+You can pass an object as first argument to use exec options. See [Node child_process](https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback).
+
+```js
+require('mediainfo-wrapper')({maxBuffer: 'infinity'}, 'foo/bar.mkv', 'foo/bar2.avi').then...
+```
+
 ### Cleaning unneccesary binaries
 
-You can clean unneeded binaries, with gulp for example:
+You can clean unneeded binaries, with gulp and nwjs for example:
 
 ```js
 var del = require('del');
 var path = require('path');
+var pkJson = require('./package.json');
 
-// clean mediainfo-wrapper
 // clean mediainfo-wrapper
 gulp.task('clean:mediainfo', () => {
     return Promise.all(['linux32','linux64'].map((platform) => {

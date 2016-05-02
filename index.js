@@ -1,5 +1,5 @@
 var path = require('path'),
-    X2JS = require('xml-json-parser'),
+    xml2js = require('xml2js'),
     exec = require('child_process').exec;
 
 function getCmd() {
@@ -16,50 +16,70 @@ function getCmd() {
 }
 
 function buildOutput(obj) {
-    var out = {
-        details: {},
-        tracks: []
-    };
-    var track = 0; // counting actual tracks (not General)
+    var out = {};
+    var idVid = idAud = idTex = idOth = 0;
 
     for (var i in obj.track) {
-        // general
-        if (obj.track[i]['_type'] === 'General') {
-            out.file = obj.track[i]['Complete_name'];
+        if (obj.track[i]['$']['type'] === 'General') {
+            out.file = obj.track[i]['Complete_name'][0];
+            out.general = {};
             for (var f in obj.track[i]) {
-                if (f !== '_type') out.details[f.toLowerCase()] = obj.track[i][f];
+                if (f !== '$') out.general[f.toLowerCase()] = obj.track[i][f];
             }
-
-            // audio/video/text
+        } else if (obj.track[i]['$']['type'] === 'Video') {
+            if (!idVid) out.video = [];
+            out.video[idVid] = {};
+            for (var f in obj.track[i]) {
+                if (f !== '$') out.video[idVid][f.toLowerCase()] = obj.track[i][f];
+            }
+            idVid++;
+        } else if (obj.track[i]['$']['type'] === 'Audio') {
+            if (!idAud) out.audio = [];
+            out.audio[idAud] = {};
+            for (var f in obj.track[i]) {
+                if (f !== '$') out.audio[idAud][f.toLowerCase()] = obj.track[i][f];
+            }
+            idAud++;
+        } else if (obj.track[i]['$']['type'] === 'Text') {
+            if (!idTex) out.text = [];
+            out.text[idTex] = {};
+            for (var f in obj.track[i]) {
+                if (f !== '$') out.text[idTex][f.toLowerCase()] = obj.track[i][f];
+            }
+            idTex++;
         } else {
-            out.tracks[track] = {};
+            if (!idOth) out.other = [];
+            out.other[idOth] = {};
             for (var f in obj.track[i]) {
-                out.tracks[track][f.toLowerCase()] = obj.track[i][f];
+                if (f !== '$') out.other[idOth][f.toLowerCase()] = obj.track[i][f];
             }
-            track++;
+            idOth++;
         }
     }
     return out;
 }
 
 function buildJson(xml) {
-    var x2js = new X2JS();
-    xml = x2js.xml_str2json(xml);
+    return new Promise(function (resolve, reject) {
+        xml2js.parseString(xml, function (err, obj) {
+            if (err) return reject(err);
+            if (!obj['Mediainfo']) return reject('Something went wrong');
 
-    if (!xml['Mediainfo']) throw 'Something went wrong';
-    xml = xml['Mediainfo'];
+            obj = obj['Mediainfo'];
 
-    var out = [];
+            var out = [];
 
-    if (Array.isArray(xml.File)) {
-        for (var i in xml.File) {
-            out.push(buildOutput(xml.File[i]));
-        }
-    } else {
-        out.push(buildOutput(xml.File));
-    }
+            if (Array.isArray(obj.File)) {
+                for (var i in obj.File) {
+                    out.push(buildOutput(obj.File[i]));
+                }
+            } else {
+                out.push(buildOutput(obj.File));
+            }
 
-    return out;
+            resolve(out);
+        });
+    });
 }
 
 module.exports = function MediaInfo() {
@@ -75,11 +95,8 @@ module.exports = function MediaInfo() {
 
     return new Promise(function (resolve, reject) {
         exec(cmd.join(' '), cmd_options, function (error, stdout, stderr) {
-            if (error !== null || stderr !== '') {
-                reject(error || stderr);
-            } else {
-                resolve(buildJson(stdout));
-            }
+            if (error !== null || stderr !== '') return reject(error || stderr);
+            buildJson(stdout).then(resolve).catch(reject);
         });
     });
 };
