@@ -31,12 +31,16 @@ var del = require('del');
 var path = require('path');
 
 // clean mediainfo-wrapper
+// clean mediainfo-wrapper
 gulp.task('clean:mediainfo', () => {
-    return Promise.all(nw.options.platforms.map((platform) => {
-        const sources = path.join('build', pkJson.name, platform);
+    return Promise.all(['linux32','linux64'].map((platform) => {
+        console.log('clean:mediainfo', platform);
+        const sources = path.join(releasesDir, pkJson.name, platform);
         return del([
             path.join(sources, 'node_modules/mediainfo-wrapper/lib/*'),
-            '!'+path.join(sources, 'node_modules/mediainfo-wrapper/lib/'+platform)
+            path.join(sources, pkJson.name + '.app/Contents/Resources/app.nw/node_modules/mediainfo-wrapper/lib/*'),
+            '!'+path.join(sources, 'node_modules/mediainfo-wrapper/lib/'+platform),
+            '!'+path.join(sources, pkJson.name + '.app/Contents/Resources/app.nw/node_modules/mediainfo-wrapper/lib/'+platform)
         ]);
     }));
 });
