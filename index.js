@@ -1,5 +1,6 @@
 var path = require('path'),
     xml2js = require('xml2js'),
+    glob = require('glob'),
     exec = require('child_process').exec;
 
 function getCmd() {
@@ -90,7 +91,10 @@ module.exports = function MediaInfo() {
     cmd.push(getCmd()); // base command
     cmd.push('--Output=XML --Full'); // args
     Array.prototype.slice.apply(args).forEach(function (val, idx) {
-        cmd.push('"' + val + '"'); // files
+        var files = glob.sync(val, {cwd: (cmd_options.cwd || process.cwd()), nonull: true});
+        for (var i in files) {
+            cmd.push('"' + files[i] + '"'); // files
+        }
     });
 
     return new Promise(function (resolve, reject) {

@@ -30,6 +30,14 @@ You can pass an object as first argument to use exec options. See [Node child_pr
 require('mediainfo-wrapper')({maxBuffer: 'infinity'}, 'foo/bar.mkv', 'foo/bar2.avi').then...
 ```
 
+### Glob
+
+You can use glob to match files:
+
+```js
+require('mediainfo-wrapper')('foo/bar.mkv', 'foo2/*', 'foo3/*.ogg').then...
+```
+
 ### Cleaning unneccesary binaries
 
 You can clean unneeded binaries, with gulp and nwjs for example:

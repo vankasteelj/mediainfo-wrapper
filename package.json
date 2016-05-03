@@ -8,7 +8,8 @@
         "url": "https://github.com/vankasteelj/mediainfo-wrapper/issues"
     },
     "dependencies": {
-        "xml2js": "^0.4.16"
+        "xml2js": "^0.4.16",
+        "glob": "^7.0.3"
     },
     "repository": {
         "type": "git",
