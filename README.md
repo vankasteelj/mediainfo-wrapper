@@ -61,6 +61,10 @@ gulp.task('clean:mediainfo', () => {
     }));
 });
 ```
+Or you can use bash script to do this, e.g to clean all binaries except OSX 64 you can run this from your project root:
+```bash
+find ./node_modules/mediainfo-wrapper/lib/* -maxdepth 1 -type d -not -name "osx64" | xargs rm -rf
+```
 
 ### License
 The MIT License
