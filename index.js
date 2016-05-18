@@ -90,12 +90,8 @@ function buildJson(xml) {
     });
 }
 
-/*
- Convert local file path to a more safe path for shell exec command use
- */
-var isWindows = !process.platform.match("darwin") && process.platform.match("win");
 function safeLocalPath(path) {
-    if (isWindows) {
+    if (process.platform.match('win32')) {
         path = '"' + path + '"';// wrap with double quotes
     } else {
         path = path.replace(/'/g, "'\"'\"'"); // escape single quotes
