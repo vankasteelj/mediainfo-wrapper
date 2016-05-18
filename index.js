@@ -18,7 +18,7 @@ function getCmd() {
 
 function buildOutput(obj) {
     var out = {};
-    var idVid = idAud = idTex = idOth = 0;
+    var idVid = idAud = idTex = idMen = idOth = 0;
 
     for (var i in obj.track) {
         if (obj.track[i]['$']['type'] === 'General') {
@@ -48,6 +48,13 @@ function buildOutput(obj) {
                 if (f !== '$') out.text[idTex][f.toLowerCase()] = obj.track[i][f];
             }
             idTex++;
+        } else if (obj.track[i]['$']['type'] === 'Menu') {
+            if (!idMen) out.menu = [];
+            out.menu[idMen] = {};
+            for (var f in obj.track[i]) {
+                if (f !== '$') out.menu[idMen][f.toLowerCase()] = obj.track[i][f];
+            }
+            idMen++;
         } else {
             if (!idOth) out.other = [];
             out.other[idOth] = {};
