@@ -7,12 +7,12 @@ function getCmd() {
     var arch = process.arch.match(/64/) ? '64' : '32';
 
     switch (process.platform) {
-    case 'darwin':
-        return '"' + path.join(__dirname, '/lib/osx64/mediainfo') + '"';
-    case 'win32':
-        return '"' + path.join(__dirname, '/lib/win32/mediainfo.exe') + '"';
-    case 'linux':
-        return 'LD_LIBRARY_PATH="' + path.join(__dirname, '/lib/linux' + arch) + '" "' + path.join(__dirname, '/lib/linux' + arch, '/mediainfo') + '"';
+        case 'darwin':
+            return safeLocalPath(path.join(__dirname, '/lib/osx64/mediainfo'));
+        case 'win32':
+            return safeLocalPath(path.join(__dirname, '/lib/win32/mediainfo.exe'));
+        case 'linux':
+            return "LD_LIBRARY_PATH=" + safeLocalPath(path.join(__dirname, '/lib/linux' + arch)) + " " + safeLocalPath(path.join(__dirname, '/lib/linux' + arch, '/mediainfo'));
     }
 }
 
@@ -83,6 +83,20 @@ function buildJson(xml) {
     });
 }
 
+/*
+ Convert local file path to a more safe path for shell exec command use
+ */
+var isWindows = !process.platform.match("darwin") && process.platform.match("win");
+function safeLocalPath(path) {
+    if (isWindows) {
+        path = '"' + path + '"';// wrap with double quotes
+    } else {
+        path = path.replace(/'/g, "'\"'\"'"); // escape single quotes
+        path = "'" + path + "'";// wrap with single quotes
+    }
+    return path;
+}
+
 module.exports = function MediaInfo() {
     var args = [].slice.call(arguments);
     var cmd_options = typeof args[0] === "object" ? args.shift() : {};
@@ -93,7 +107,7 @@ module.exports = function MediaInfo() {
     Array.prototype.slice.apply(args).forEach(function (val, idx) {
         var files = glob.sync(val, {cwd: (cmd_options.cwd || process.cwd()), nonull: true});
         for (var i in files) {
-            cmd.push('"' + files[i] + '"'); // files
+            cmd.push(safeLocalPath(files[i])); // files
         }
     });
 
