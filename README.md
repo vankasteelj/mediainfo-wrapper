@@ -22,12 +22,12 @@ mi('foo/bar.mkv', 'foo/bar2.avi').then(function(data) {
 }).catch(function (e){console.error(e)});
 ```
 
-### Using child_process power
-
-You can pass an object as first argument to use exec options. See [Node child_process](https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback).
+### Using fluent-child-process power
+This library built over [fluent-child-process](https://github.com/digital-flowers/fluent-child-process) so still you can pass any extra options to fluent-child-process 
+You can pass an object as first argument to use fluent-child-process options. See [fluent-child-process](https://github.com/digital-flowers/fluent-child-process).
 
 ```js
-require('mediainfo-wrapper')({maxBuffer: 'infinity'}, 'foo/bar.mkv', 'foo/bar2.avi').then...
+require('fluent-mediainfo')({logger:mylogger}, 'foo/bar.mkv', 'foo/bar2.avi').then...
 ```
 
 ### Glob
