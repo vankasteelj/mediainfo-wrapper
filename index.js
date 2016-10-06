@@ -93,18 +93,29 @@ function buildJson(xml) {
     });
 }
 
+function resolveGlobFiles(cmd_options, path) {
+    return new Promise(function (resolve, reject) {
+        glob(path, {cwd: (cmd_options.cwd || process.cwd()), nonull: true}, function (err, files) {
+            if (err) return reject(err);
+            return resolve(files);
+        });
+    });
+};
+
 module.exports = function MediaInfo() {
     var args = [].slice.call(arguments);
     var cmd_options = typeof args[0] === "object" ? args.shift() : {};
     var cmd_args = ['--Output=XML', '--Full'];
-    args.forEach(function (val, idx) {
-        var files = glob.sync(val, {cwd: (cmd_options.cwd || process.cwd()), nonull: true});
-        cmd_args = cmd_args.concat(files);
-    });
     return new Promise(function (resolve, reject) {
-        fluent(getCmd(), cmd_args, cmd_options, function (error, stdout, stderr) {
-            if (error || stderr) return reject(error || stderr);
-            buildJson(stdout).then(resolve).catch(reject);
-        });
+        // resolve glob file paths
+        Promise.all(args.map(resolveGlobFiles.bind(null, cmd_options))).then(function (allFiles) {
+            var flattened = allFiles.reduce(function (a, b) {
+                return a.concat(b);
+            }, []);
+            fluent(getCmd(), cmd_args.concat(flattened), cmd_options, function (error, stdout, stderr) {
+                if (error || stderr) return reject(error || stderr);
+                buildJson(stdout).then(resolve).catch(reject);
+            });
+        }).catch(reject);
     });
 };
