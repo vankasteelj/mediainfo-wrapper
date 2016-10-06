@@ -1,18 +1,19 @@
 var path = require('path'),
     xml2js = require('xml2js'),
     glob = require('glob'),
-    exec = require('child_process').exec;
+    fluent = require("fluent-child-process");
+
 
 function getCmd() {
     var arch = process.arch.match(/64/) ? '64' : '32';
 
     switch (process.platform) {
         case 'darwin':
-            return safeLocalPath(path.join(__dirname, '/lib/osx64/mediainfo'));
+            return path.join(__dirname, '/lib/osx64/mediainfo');
         case 'win32':
-            return safeLocalPath(path.join(__dirname, '/lib/win32/mediainfo.exe'));
+            return path.join(__dirname, '/lib/win32/mediainfo.exe');
         case 'linux':
-            return "LD_LIBRARY_PATH=" + safeLocalPath(path.join(__dirname, '/lib/linux' + arch)) + " " + safeLocalPath(path.join(__dirname, '/lib/linux' + arch, '/mediainfo'));
+            return "LD_LIBRARY_PATH=" + path.join(__dirname, '/lib/linux' + arch) + " " + path.join(__dirname, '/lib/linux' + arch, '/mediainfo');
         default:
             throw 'unsupported platform';
     }
@@ -92,33 +93,17 @@ function buildJson(xml) {
     });
 }
 
-function safeLocalPath(path) {
-    if (process.platform.match('win32')) {
-        path = '"' + path + '"';// wrap with double quotes
-    } else {
-        path = path.replace(/'/g, "'\"'\"'"); // escape single quotes
-        path = "'" + path + "'";// wrap with single quotes
-    }
-    return path;
-}
-
 module.exports = function MediaInfo() {
     var args = [].slice.call(arguments);
     var cmd_options = typeof args[0] === "object" ? args.shift() : {};
-    var cmd = [];
-
-    cmd.push(getCmd()); // base command
-    cmd.push('--Output=XML --Full'); // args
-    Array.prototype.slice.apply(args).forEach(function (val, idx) {
+    var cmd_args = ['--Output=XML', '--Full'];
+    args.forEach(function (val, idx) {
         var files = glob.sync(val, {cwd: (cmd_options.cwd || process.cwd()), nonull: true});
-        for (var i in files) {
-            cmd.push(safeLocalPath(files[i])); // files
-        }
+        cmd_args = cmd_args.concat(files);
     });
-
     return new Promise(function (resolve, reject) {
-        exec(cmd.join(' '), cmd_options, function (error, stdout, stderr) {
-            if (error !== null || stderr !== '') return reject(error || stderr);
+        fluent(getCmd(), cmd_args, cmd_options, function (error, stdout, stderr) {
+            if (error || stderr) return reject(error || stderr);
             buildJson(stdout).then(resolve).catch(reject);
         });
     });

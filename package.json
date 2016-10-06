@@ -1,28 +1,29 @@
 {
-    "name": "mediainfo-wrapper",
-    "version": "1.2.0",
-    "description": "wrapper for mediainfo-prebuilt",
-    "main": "index.js",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/vankasteelj/mediainfo-wrapper/issues"
-    },
-    "dependencies": {
-        "xml2js": "^0.4.16",
-        "glob": "^7.0.3"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/vankasteelj/mediainfo-wrapper.git"
-    },
-    "keywords": [
-        "mediainfo",
-        "media",
-        "metadata",
-        "codecs"
-    ],
-    "author": {
-        "name": "Jean van Kasteel",
-        "email": "vankasteelj@gmail.com"
-    }
+  "name": "mediainfo-wrapper",
+  "version": "1.3.0",
+  "description": "wrapper for mediainfo-prebuilt",
+  "main": "index.js",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vankasteelj/mediainfo-wrapper/issues"
+  },
+  "dependencies": {
+    "fluent-child-process": "^1.0.0",
+    "xml2js": "^0.4.16",
+    "glob": "^7.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vankasteelj/mediainfo-wrapper.git"
+  },
+  "keywords": [
+    "mediainfo",
+    "media",
+    "metadata",
+    "codecs"
+  ],
+  "author": {
+    "name": "Jean van Kasteel",
+    "email": "vankasteelj@gmail.com"
+  }
 }
