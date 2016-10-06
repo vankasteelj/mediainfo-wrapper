@@ -8,7 +8,7 @@
     "url": "https://github.com/vankasteelj/mediainfo-wrapper/issues"
   },
   "dependencies": {
-    "fluent-child-process": "^1.0.0",
+    "fluent-child-process": "^1.0.1",
     "xml2js": "^0.4.16",
     "glob": "^7.0.3"
   },
